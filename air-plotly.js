@@ -9,8 +9,6 @@ var dataset = [];					//Initialize empty array
 var xRange = 1500;	//Max range of new x values
 var yRange = 300;	//Max range of new y values
 
-
-
 const parseTime = d3.timeParse("%Y%m%d-%H%M%S");
 var rowConverter = function(d) {
   return {
@@ -29,11 +27,17 @@ d3.csv("919587.csv", rowConverter)
   .then(data => {
     // console.log(data);
     
-    // Insert des NaN si pas de mesures en 10 minutes (à faire plutôt 1 fois en offline)
+    
     i = data.length; 
     while(i-- > 1) {
+      // Insert des NaN si PM_10=PM_2_5=TEMP de mesures en 10 minutes (à faire plutôt 1 fois en offline)
+      if (data[i].PM_10 == data[i].PM_2_5 && data[i].PM_2_5==data[i].TEMP) {
+        data[i].PM_10 = NaN;
+        data[i].PM_2_5 = NaN;
+      }
+      // Insert des NaN si pas de mesures en 10 minutes (à faire plutôt 1 fois en offline)
         delta = 0.001* (data[i].date - data[i-1].date);
-        if (delta > 10000) { 
+        if (delta > 3000) { 
           console.log( data[i-1].date+": "+delta + "s");
           data.splice(i, 0, {date: new Date(data[i-1].date.getTime()+ 100000), 
             PM_10: NaN, PM_2_5: NaN, TEMP: NaN, PRESS: NaN, HUMID: NaN})}
@@ -64,6 +68,18 @@ d3.csv("919587.csv", rowConverter)
 
     // Graphique
     makePlotly(data);
+
+    // Ajout d'annotations
+    fetch("annotations.json")
+        .then((response) => response.json())
+        .then((data) => { 
+          console.log(data); 
+          var annotation = data.TEMP.map(el => {
+            return({"x":new Date(el.date), "y":el.y, text:el.text})});
+          
+          Plotly.relayout('plot-temp', {annotations: annotation}) 
+        })
+    
 
   });
 
@@ -104,15 +120,50 @@ d3.csv("919587.csv", rowConverter)
       type: 'scatter'
     }
 
-    var layout = {
-        title: 'Températures TODS',
-        yaxis: { title: 'Températures °C', 
-                  rangemode: 'tozero',
-                  autorange: true },
-        legend: {traceorder: 'reversed' }
-       };
+    date_deb = data[0].date
+    date_fin = data[data.length-1].date
+    var trace_19_deg = {
+      x: [date_deb, date_fin],
+      y: [19, 19],
+      name: '19°C',
+      type: 'scatter', 
+      mode: 'lines',
+      line: { color: 'rgb(255, 10, 10)', width: 2 }
+    }
 
-    Plotly.newPlot("plot-temp", [trace_temp], layout);
+
+    Plotly.newPlot("plot-temp", [trace_temp, trace_19_deg], {
+      title: 'Températures TODS',
+      xaxis : {
+        autorange: true,
+        range: [date_deb, date_fin],
+        rangeselector: {buttons: [
+          {
+            count: 1,
+            label: '1 jour',
+            step: 'day',
+            stepmode: 'backward'
+          },
+          {
+            count: 7,
+            label: '1 semaine',
+            step: 'day',
+            stepmode: 'backward'
+          },
+          {
+            count: 1,
+            label: '1 mois',
+            step: 'month',
+            stepmode: 'backward'
+          },
+          {step: 'all', label: 'Tout'}
+        ]}
+      },
+      yaxis: { title: 'Températures °C', 
+                rangemode: 'tozero',
+                autorange: true },
+      legend: {traceorder: 'reversed' }
+     }, {responsive: true});
 
     Plotly.newPlot("plot-pm", [trace_pm10, trace_pm2],  {
       title: 'Particules fines TODS',
@@ -120,6 +171,7 @@ d3.csv("919587.csv", rowConverter)
                 rangemode: 'tozero',
                 autorange: true },
       legend: {traceorder: 'reversed' }
-     });
+    }, {responsive: true}
+    );
 
   };
