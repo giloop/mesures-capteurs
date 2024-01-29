@@ -1,0 +1,3 @@
+$client = new-object System.Net.WebClient
+$client.DownloadFile("https://gueulomaton.org/tods/929078.csv","929078.csv")
+$client.DownloadFile("https://gueulomaton.org/tods/919587.csv","919587.csv")
