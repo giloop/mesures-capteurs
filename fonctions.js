@@ -16,8 +16,14 @@ var preprocess_capteur = function(data) {
     i = data.length; 
     while(i-- > 1) {
       // Insert des NaN si PM_10=PM_2_5=TEMP de mesures en 10 minutes (à faire plutôt 1 fois en offline)
-      if (data[i].PM_10 == data[i].PM_2_5 && data[i].PM_2_5==data[i].TEMP) {
+      if (data[i].PM_10 == data[i].PM_2_5) {
         data[i].PM_10 = NaN;
+        data[i].PM_2_5 = NaN;
+      }
+      if (data[i].PM_10 == data[i].TEMP) {
+        data[i].PM_10 = NaN;
+      }
+      if (data[i].PM_2_5 == data[i].TEMP) {
         data[i].PM_2_5 = NaN;
       }
       // Insert des NaN si pas de mesures en 10 minutes (à faire plutôt 1 fois en offline)
@@ -37,11 +43,12 @@ function makePlotly(data, nom_capteur) {
     var trace_pm10 = {
         x: data.map(el => el.date),
         y: data.map(el => el.PM_10),
-        text: data.map(el => "".concat(el.TEMP,"°C<br>Pression", 10*Math.round(el.PRESS/1000), "mBar", 
-          "<br>PM_10     : ", el.PM_10, "µg/m³",
-          "<br>PM_2_5    : ", el.PM_2_5, "µg/m³",
-          "<br>humidité  : ", el.HUMID, "%",
-          "<br>humidité  : ", el.HUMID, "%")),
+        text: data.map(el => "".concat(
+          "PM_10     : ", el.PM_10, "µg/m³<br>",
+          "PM_2_5    : ", el.PM_2_5, "µg/m³<br>",
+          "Temp      : ", el.TEMP,"°C<br>", 
+          "Pression  :", 10*Math.round(el.PRESS/1000), "mBar<br>", 
+          "Humidité  : ", el.HUMID, "%")),
         name: (nom_capteur + ' PM 10µ'),
         type: 'scatter'
     }
@@ -49,11 +56,12 @@ function makePlotly(data, nom_capteur) {
     var trace_pm2 = {
       x: data.map(el => el.date),
       y: data.map(el => el.PM_2_5),
-      text: data.map(el => "".concat(el.TEMP,"°C<br>Pression", 10*Math.round(el.PRESS/1000), "mBar", 
-        "<br>PM_10     : ", el.PM_10, "µg/m³",
-        "<br>PM_2_5    : ", el.PM_2_5, "µg/m³",
-        "<br>humidité  : ", el.HUMID, "%",
-        "<br>humidité  : ", el.HUMID, "%")),
+      text: data.map(el => "".concat(
+        "PM_2_5    : ", el.PM_2_5, "µg/m³<br>",
+        "PM_10     : ", el.PM_10, "µg/m³<br>",
+        "Temp      : ", el.TEMP,"°C<br>", 
+        "Pression  : ", 10*Math.round(el.PRESS/1000), "mBar<br>", 
+        "Humidité  : ", el.HUMID, "%")),
       name: (nom_capteur + ' PM 2.5µ'),
       type: 'scatter'
     }
@@ -61,10 +69,13 @@ function makePlotly(data, nom_capteur) {
     var trace_temp = {
       x: data.map(el => el.date),
       y: data.map(el => el.TEMP),
-      text: data.map(el => "".concat(el.TEMP,"°C<br>Pression ", 10*Math.round(el.PRESS/1000), "mBar", 
-      "<br>PM_10     : ", el.PM_10, "µg/m³",
-      "<br>PM_2_5    : ", el.PM_2_5, "µg/m³",
-      "<br>humidité  : ", el.HUMID, "%") ),
+      text: data.map(el => "".concat(
+        "Température : ", el.TEMP,"°C<br>", 
+        "Humidité    : ", el.HUMID, "%<br>",
+        "Pression    :", 10*Math.round(el.PRESS/1000), "mBar<br>", 
+        "PM_10       : ", el.PM_10, "µg/m³<br>",
+        "PM_2_5      : ", el.PM_2_5, "µg/m³"
+        )),
       name: nom_capteur,
       type: 'scatter'
     }
@@ -132,19 +143,23 @@ function makePlotly(data, nom_capteur) {
 var add_trace_capteur = function(fic_csv, nom_capteur, graphTemp, graphPM) {
     
     console.log(fic_csv)
-    d3.csv(fic_csv, rowConverter)
+    d3.csv(fic_csv+"?"+(new Date()).getTime(), rowConverter)
     .then(data => {
     
-        console.log(data)
-        
+        // console.log(data)
+        // Ajout de NaN dans les trous
+        data = preprocess_capteur(data);
+
         var trace_pm10 = {
             x: data.map(el => el.date),
             y: data.map(el => el.PM_10),
-            text: data.map(el => "".concat(el.TEMP,"°C<br>Pression", 10*Math.round(el.PRESS/1000), "mBar", 
-            "<br>PM_10     : ", el.PM_10, "µg/m³",
-            "<br>PM_2_5    : ", el.PM_2_5, "µg/m³",
-            "<br>humidité  : ", el.HUMID, "%",
-            "<br>humidité  : ", el.HUMID, "%")),
+            text: data.map(el => "".concat(
+              "PM_10       : ", el.PM_10, "µg/m³<br>",
+              "PM_2_5      : ", el.PM_2_5, "µg/m³<br>",
+              "Température : ", el.TEMP,"°C<br>", 
+              "Humidité    : ", el.HUMID, "%<br>",
+              "Pression    :", 10*Math.round(el.PRESS/1000), "mBar"              
+              )),
             name: (nom_capteur + ' PM 10µ'),
             type: 'scatter'
         }
@@ -152,11 +167,13 @@ var add_trace_capteur = function(fic_csv, nom_capteur, graphTemp, graphPM) {
         var trace_pm2 = {
             x: data.map(el => el.date),
             y: data.map(el => el.PM_2_5),
-            text: data.map(el => "".concat(el.TEMP,"°C<br>Pression", 10*Math.round(el.PRESS/1000), "mBar", 
-                "<br>PM_10     : ", el.PM_10, "µg/m³",
-                "<br>PM_2_5    : ", el.PM_2_5, "µg/m³",
-                "<br>humidité  : ", el.HUMID, "%",
-                "<br>humidité  : ", el.HUMID, "%")),
+            text: data.map(el => "".concat(
+              "PM_2_5      : ", el.PM_2_5, "µg/m³<br>",
+              "PM_10       : ", el.PM_10, "µg/m³<br>",
+              "Température : ", el.TEMP,"°C<br>", 
+              "Humidité    : ", el.HUMID, "%<br>",
+              "Pression    :", 10*Math.round(el.PRESS/1000), "mBar"              
+              )),
             name: (nom_capteur + ' PM 2.5µ'),
             type: 'scatter'
         }
@@ -164,10 +181,13 @@ var add_trace_capteur = function(fic_csv, nom_capteur, graphTemp, graphPM) {
         var trace_temp = {
             x: data.map(el => el.date),
             y: data.map(el => el.TEMP),
-            text: data.map(el => "".concat(el.TEMP,"°C<br>Pression ", 10*Math.round(el.PRESS/1000), "mBar", 
-            "<br>PM_10     : ", el.PM_10, "µg/m³",
-            "<br>PM_2_5    : ", el.PM_2_5, "µg/m³",
-            "<br>humidité  : ", el.HUMID, "%") ),
+            text: data.map(el => "".concat(
+              "Température : ", el.TEMP,"°C<br>", 
+              "Humidité    : ", el.HUMID, "%<br>",
+              "Pression    :", 10*Math.round(el.PRESS/1000), "mBar<br>", 
+              "PM_10       : ", el.PM_10, "µg/m³<br>",
+              "PM_2_5      : ", el.PM_2_5, "µg/m³"
+              ) ),
             name: nom_capteur,
             type: 'scatter'
         }

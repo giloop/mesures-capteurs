@@ -18,6 +18,7 @@ d3.csv("919587.csv", rowConverter)
     .append("th").html(d => d);
 
     // Ajout des données (seulement les 10 premières)
+    pad_2_0 = function(el) { return (("0"+el).slice(-2)); }
     d3.select("#tableau-temp").append("tbody").selectAll("tr")
     .data(data.slice(data.length-10, data.length-1))
     .enter()
@@ -26,8 +27,8 @@ d3.csv("919587.csv", rowConverter)
     .data(d => { 
       el = Object.values(d);
       return([ "".concat(el[0].getDate(), "/", 
-      el[0].getMonth(), "/", el[0].getFullYear(), " ", 
-      el[0].getHours(), ":", el[0].getMinutes(),  ":", el[0].getSeconds())].concat(el.slice(1))) })
+      pad_2_0(el[0].getMonth()+1), "/", el[0].getFullYear(), " ", 
+      pad_2_0(el[0].getHours()), ":", pad_2_0(el[0].getMinutes()),  ":", pad_2_0(el[0].getSeconds()))].concat(el.slice(1))) })
         .enter()
         .append("td")
         .html(d => d  );
@@ -39,7 +40,7 @@ d3.csv("919587.csv", rowConverter)
     fetch("annotations.json")
         .then((response) => response.json())
         .then((data) => { 
-          console.log(data); 
+          //console.log(data); 
           var annotation = data.TEMP.map(el => {
             return({"x":new Date(el.date), "y":el.y, text:el.text})});
           
