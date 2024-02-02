@@ -16,16 +16,25 @@ var preprocess_capteur = function(data) {
     i = data.length; 
     while(i-- > 1) {
       // Insert des NaN si PM_10=PM_2_5=TEMP de mesures en 10 minutes (à faire plutôt 1 fois en offline)
-      if (data[i].PM_10 == data[i].PM_2_5) {
+      if (data[i].PM_10 < data[i].PM_2_5) {
         data[i].PM_10 = NaN;
         data[i].PM_2_5 = NaN;
-      }
+      } 
+
       if (data[i].PM_10 == data[i].TEMP) {
         data[i].PM_10 = NaN;
       }
       if (data[i].PM_2_5 == data[i].TEMP) {
         data[i].PM_2_5 = NaN;
       }
+
+      // Bug Météo 
+      if (data[i].PRESS < 10) {
+        data[i].TEMP = NaN;
+        data[i].HUMID = NaN;
+        data[i].PRESS = NaN;
+      }
+      
       // Insert des NaN si pas de mesures en 10 minutes (à faire plutôt 1 fois en offline)
         delta = 0.001* (data[i].date - data[i-1].date);
         if (delta > 3000) { 
@@ -146,7 +155,7 @@ var add_trace_capteur = function(fic_csv, nom_capteur, graphTemp, graphPM) {
     d3.csv(fic_csv+"?"+(new Date()).getTime(), rowConverter)
     .then(data => {
     
-        // console.log(data)
+        console.log(data)
         // Ajout de NaN dans les trous
         data = preprocess_capteur(data);
 
