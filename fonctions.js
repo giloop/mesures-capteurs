@@ -29,7 +29,7 @@ var preprocess_capteur = function(data) {
       }
 
       // Bug Météo 
-      if (data[i].PRESS < 10) {
+      if (data[i].PRESS < 10 || data[i].TEMP<-30 || data[i].TEMP>70 ) {
         data[i].TEMP = NaN;
         data[i].HUMID = NaN;
         data[i].PRESS = NaN;
