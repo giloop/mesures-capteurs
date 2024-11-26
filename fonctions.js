@@ -68,7 +68,7 @@ function makePlotly(data, nom_capteur) {
       text: data.map(el => "".concat(
         "PM_2_5    : ", el.PM_2_5, "µg/m³<br>",
         "PM_10     : ", el.PM_10, "µg/m³<br>",
-        "Temp      : ", el.TEMP,"°C<br>", 
+        "Temp      : ", el.TEMP, "°C<br>", 
         "Pression  : ", 10*Math.round(el.PRESS/1000), "mBar<br>", 
         "Humidité  : ", el.HUMID, "%")),
       name: (nom_capteur + ' PM 2.5µ'),

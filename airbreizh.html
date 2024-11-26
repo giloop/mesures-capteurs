@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesures Airbreizh</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>
+</head>
+<body>
+    <h1>Récupération des données</h1>
+    <p>Nous récupérons depuis le site data.airbreizh.asso.fr les données de pollution. Il semble que 
+        la mesure la plus détaillée est celle des moyennes journalières des différents polluants. 
+        On teste ici l'affichage des fichiers des différentes grandes villes bretonnes.
+    </p>
+    <ul>
+        <li><a href="https://data.airbreizh.asso.fr/geoserver/mes_bretagne_journalier_poll_princ/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=mes_bretagne_journalier_poll_princ:mes_bretagne_journalier_pm25&outputFormat=application%2Fjson">Mesures PM2.5</a></li>
+        <li><a href="https://data.airbreizh.asso.fr/geoserver/mes_bretagne_journalier_poll_princ/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=mes_bretagne_journalier_poll_princ:mes_bretagne_journalier_no2&outputFormat=application%2Fjson">Mesures NO2</a></li>
+        <li><a href="https://data.airbreizh.asso.fr/geoserver/mes_bretagne_journalier_poll_princ/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=mes_bretagne_journalier_poll_princ:mes_bretagne_journalier_o3&outputFormat=application%2Fjson">Mesures O3</a></li>
+        <li><a href="https://data.airbreizh.asso.fr/geoserver/mes_bretagne_journalier_poll_princ/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=mes_bretagne_journalier_poll_princ:mes_bretagne_journalier_nox&outputFormat=application%2Fjson">Mesures NOx</a> : non mesuré</li>
+    </ul>
+
+    <h1>Visualisations</h1>
+    <div class="container"><div class="row"><div class="col-sm-12">
+		<div id="plot-pm25"></div>
+	</div></div></div>
+    <div class="container"><div class="row"><div class="col-sm-12">
+    	<div id="plot-no2"></div>
+	</div></div></div>
+    <div class="container"><div class="row"><div class="col-sm-12">
+    	<div id="plot-o3"></div>
+	</div></div></div>
+    <!-- div class="container"><div class="row"><div class="col-sm-12">
+    	<div id="plot-nox"></div>
+	</div></div></div -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+<script src="fonctions-airbreizh.js"></script>
+<script src="airbreizh.js"></script>
+
+</body>
+</html>
