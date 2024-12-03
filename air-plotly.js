@@ -34,7 +34,7 @@ d3.csv("919587.csv", rowConverter)
         .html(d => d  );
 
     // Graphique
-    makePlotly(data, "Bigoudi");
+    makePlotly(data, "CCBR");
 
     // Ajout d'annotations
     fetch("annotations.json")
