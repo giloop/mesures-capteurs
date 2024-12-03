@@ -76,6 +76,21 @@ function makePlotly(data, elID, seuil) {
       title: data.mesure,
       xaxis : {
         autorange: true,
+        rangeselector: {buttons: [
+          {
+            count: 1,
+            label: '1 mois',
+            step: 'month',
+            stepmode: 'backward'
+          },
+          {
+            count: 1,
+            label: '1 année',
+            step: 'year',
+            stepmode: 'backward'
+          },
+          {step: 'all', label: 'Tout'}
+        ]}
        },
       yaxis: { title: data.unite_y, 
                rangemode: 'tozero',
